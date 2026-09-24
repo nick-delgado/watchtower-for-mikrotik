@@ -2,6 +2,7 @@
 /// certificate pinning.
 library;
 
+export 'src/client.dart';
 export 'src/connection.dart';
 export 'src/errors.dart';
 export 'src/fingerprint.dart';
