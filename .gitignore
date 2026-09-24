@@ -1,0 +1,6 @@
+# Dart / Flutter
+.dart_tool/
+build/
+
+# Raw captures from the Phase 0 probe contain private network data (MACs, hostnames, logs)
+probe-output/
