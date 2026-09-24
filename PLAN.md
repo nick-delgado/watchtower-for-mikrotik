@@ -94,14 +94,19 @@ Notes:
 
 1. The app explains what's needed and generates a strong random password for the read-only user.
    Letters and digits only, since the RouterOS terminal treats `$` and `?` specially even inside quotes.
-2. It shows a copy-paste command block (password embedded) with Copy and Share buttons. The user
-   runs it in the router's terminal (WinBox, WebFig, or SSH).
-3. Router address is pre-filled with the phone's default gateway (usually `192.168.88.1`), editable.
-4. The app connects to port 8729, shows the certificate's SHA-256 fingerprint, and the user
-   confirms it. The app pins it.
-5. Credentials and the pin are stored in the Keychain / Keystore (`flutter_secure_storage`).
+2. It shows the commands (password embedded) as a numbered list, each wrapped and with its own
+   copy button, plus Copy all and Share. The user runs them in the router's terminal (WinBox,
+   WebFig, or SSH). Users who set up Watchtower before can enter the existing user's password
+   instead, or run `/user set` with the generated one.
+3. Router address is pre-filled with `192.168.88.1` (MikroTik's default) and editable. Detecting
+   the phone's gateway is in FUTURE.md.
+4. The app connects to port 8729, shows the certificate's SHA-256 fingerprint in the same
+   lowercase form RouterOS prints, and the user confirms it. The app pins it.
+5. Credentials and the pin are stored in the Keychain / Keystore (`flutter_secure_storage`). On
+   iOS the item is "this device only", so it's never synced to iCloud or restored to another
+   phone. Note that iOS keeps Keychain items when the app is deleted.
 6. On every connection: TLS handshake → fingerprint must match the pin → only then send the login.
-   On a mismatch: stop, explain, and offer a re-pair flow.
+   On a mismatch: stop, show the new fingerprint, and offer to trust it.
 
 Router setup commands (validated on the hAP ax³, 7.24.4):
 
@@ -151,6 +156,21 @@ Router setup commands (validated on the hAP ax³, 7.24.4):
    CI in `.github/workflows/ci.yml`.
 2. **Onboarding and connection.** Setup commands, address, fingerprint pinning, secure storage,
    permission prompts, connection gate.
+   **Done 2026-09-24:**
+   - `SessionNotifier` (`lib/data/session.dart`) holds the session state: needs setup, connected
+     (real or demo), paused, unreachable, sign-in rejected, or certificate changed.
+   - It closes the connection when the app is hidden, reconnects when it returns, and reconnects
+     if the router drops the connection.
+   - Pairing flow: welcome, then prepare the router, find it, check the certificate. There's a
+     screen for each connection problem, and "Forget this router" / "Exit demo" in the menu.
+   - Native: `ACCESS_LOCAL_NETWORK` request and "open Settings" in `MainActivity.kt` and
+     `AppDelegate.swift`; `NSLocalNetworkUsageDescription`; `INTERNET` in the main manifest.
+     Target SDK 37.
+   - `integration_test/pairing_test.dart` pairs with the real router from the iOS 27 simulator
+     and screenshots each step.
+   - Pairing and connecting work on the physical iPhone (iOS 27) and Android phone (Android 17),
+     including their local network permission prompts. Only the happy path has been tried on
+     the phones so far; the problem screens are covered by widget tests.
 3. **Dashboard.** Router summary + live internet graph.
 4. **Wi-Fi clients.** List (name, IP, SSID/band, signal, live speed), detail screen, per-client graph.
 5. **Logs.** Live view, topic filter, search.
@@ -167,6 +187,15 @@ TestFlight and the App Store need the paid Apple Developer Program.
 
 Test devices: an iPhone 12 Pro on iOS 27 and an Android phone on Android 17. The app runs on the
 iOS 27 simulator (checked 2026-09-24). The deployment target stays at Flutter's default (iOS 15).
+
+End-to-end pairing test against a real router (screenshots go to `build/screenshots/`):
+
+```sh
+flutter drive --driver=test_driver/integration_test.dart \
+  --target=integration_test/pairing_test.dart -d <device> \
+  --dart-define=ROUTER_PIN=<sha256> \
+  --dart-define=ROUTER_PASSWORD="$(security find-generic-password -s watchtower-router -a watchtower -w)"
+```
 
 For router testing: the hAP ax³ is the reference device. MikroTik's free virtual router (CHR) runs
 on Apple Silicon and is useful for automated tests of non-Wi-Fi features, but it has no Wi-Fi.

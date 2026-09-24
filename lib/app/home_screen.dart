@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../data/demo_router_client.dart';
 import '../data/providers.dart';
 import '../data/router_summary.dart';
+import '../data/session.dart';
 import 'format.dart';
+import 'router_menu.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isDemo = ref.watch(routerClientProvider).value is DemoRouterClient;
+    final session = ref.watch(sessionProvider).value;
+    final isDemo = session is Connected && session.isDemo;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Watchtower'),
@@ -21,6 +23,7 @@ class HomeScreen extends ConsumerWidget {
               padding: EdgeInsets.only(right: 12),
               child: Chip(label: Text('Demo')),
             ),
+          const RouterMenuButton(),
         ],
       ),
       body: ref
@@ -74,7 +77,7 @@ class RouterSummaryCard extends StatelessWidget {
                     children: [
                       Text(summary.identity, style: theme.textTheme.titleLarge),
                       Text(
-                        '${summary.board} · RouterOS ${summary.version}',
+                        '${formatBoardName(summary.board)} · RouterOS ${summary.version}',
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
                         ),

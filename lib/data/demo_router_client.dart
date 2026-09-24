@@ -20,6 +20,7 @@ class DemoRouterClient implements RouterClient {
   }
 
   final Map<String, Object?> _fixture;
+  final _done = Completer<void>();
   var _poll = 0;
 
   @override
@@ -58,7 +59,12 @@ class DemoRouterClient implements RouterClient {
   }
 
   @override
-  Future<void> close() async {}
+  Future<void> close() async {
+    if (!_done.isCompleted) _done.complete();
+  }
+
+  @override
+  Future<void> get done => _done.future;
 
   // Replays the log backlog as new lines, one every few seconds.
   Stream<Map<String, String>> _logLines() {
