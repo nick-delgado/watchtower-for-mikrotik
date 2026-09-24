@@ -6,6 +6,8 @@
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Watchtower connects to your MikroTik router on your home network to show its status.</string>
 	<key>CFBundleDisplayName</key>
 	<string>Watchtower</string>
 	<key>CFBundleExecutable</key>

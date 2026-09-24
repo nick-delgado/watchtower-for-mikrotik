@@ -31,7 +31,7 @@ class RouterOsConnection implements RouterClient {
   var _nextTag = 0;
   var _closed = false;
 
-  /// Completes when the connection closes, for whatever reason.
+  @override
   Future<void> get done => _done.future;
 
   /// Returns the certificate the router presents, then disconnects without

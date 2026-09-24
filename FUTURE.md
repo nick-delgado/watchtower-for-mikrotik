@@ -37,6 +37,12 @@ Local, on-phone names for clients (still read-only on the router). Keyed by MAC,
 private (randomized) MAC per Wi-Fi network, so the same phone can show up with different MACs on
 the 2.4 GHz and 5 GHz SSIDs.
 
+## Find the router automatically
+
+Pairing pre-fills MikroTik's default address (`192.168.88.1`). Detecting the phone's default
+gateway, or listening for MikroTik's discovery broadcasts (MNDP, UDP 5678, which WinBox uses),
+would help routers on other subnets. MNDP needs Apple's multicast entitlement on iOS.
+
 ## One-time setup over SSH
 
 Instead of copy-paste commands, the user enters admin credentials once and the app runs the setup

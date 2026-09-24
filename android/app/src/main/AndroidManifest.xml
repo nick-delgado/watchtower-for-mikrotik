@@ -1,4 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Connects to the router over the local network. Android 17 also asks
+         the user for ACCESS_LOCAL_NETWORK at runtime (see MainActivity). -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_LOCAL_NETWORK" />
     <application
         android:label="Watchtower"
         android:name="${applicationName}"

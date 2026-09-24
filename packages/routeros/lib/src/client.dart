@@ -24,4 +24,8 @@ abstract interface class RouterClient {
 
   /// Ends the session.
   Future<void> close();
+
+  /// Completes when the session ends, whether through [close] or because
+  /// the connection dropped.
+  Future<void> get done;
 }

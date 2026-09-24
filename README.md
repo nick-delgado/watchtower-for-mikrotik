@@ -17,10 +17,13 @@ for deferred ideas, and [RELEASE.md](RELEASE.md) for release concerns.
 
 ```sh
 flutter pub get
-flutter run                       # uses the demo router for now
+flutter run                       # pair with your router, or try the demo
 flutter test
 (cd packages/routeros && dart test)
 ```
+
+`integration_test/pairing_test.dart` pairs with a real router end to end. See "Development
+environment" in PLAN.md for the command.
 
 ## Probing a router
 
