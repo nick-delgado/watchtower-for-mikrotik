@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'client.dart';
 import 'errors.dart';
 import 'fingerprint.dart';
 import 'protocol.dart';
@@ -10,7 +11,7 @@ import 'protocol.dart';
 /// Every command gets its own `.tag`, so several commands, including
 /// never-ending ones like `listen` and `monitor-traffic`, can run at once
 /// over one connection.
-class RouterOsConnection {
+class RouterOsConnection implements RouterClient {
   RouterOsConnection._(this._socket) {
     _socket.listen(
       _onData,
@@ -110,6 +111,7 @@ class RouterOsConnection {
   ///
   /// [params] become `=key=value` words. [queries] are passed through as
   /// query words, e.g. `?type=ether`.
+  @override
   Future<List<Map<String, String>>> call(
     String command, {
     Map<String, String> params = const {},
@@ -119,6 +121,7 @@ class RouterOsConnection {
   /// Runs [command] and emits each `!re` reply as it arrives. For commands
   /// that never finish on their own (`listen`, `monitor-traffic`), cancelling
   /// the subscription sends `/cancel` to the router.
+  @override
   Stream<Map<String, String>> stream(
     String command, {
     Map<String, String> params = const {},
@@ -153,6 +156,7 @@ class RouterOsConnection {
   }
 
   /// Closes the connection. Running commands end without an error.
+  @override
   Future<void> close() async => _shutDown();
 
   void _send(List<String> words) => _socket.add(encodeSentence(words));
