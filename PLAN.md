@@ -52,8 +52,8 @@ packages/routeros/  Pure-Dart API client: sentence encoding, login, .tag multipl
 lib/data/           Repositories turning API replies into typed models and streams
                     (SystemInfo, TrafficSample, WifiClient, LogEntry); rate calculation.
 lib/app/            Flutter UI and state management (Riverpod).
-test/fixtures/      Recorded router responses replayed by a fake transport for UI
-                    development, tests, and demo mode.
+assets/demo/        router.json: anonymized capture replayed by DemoRouterClient for demo
+                    mode, UI development and tests.
 ```
 
 Raw probe captures (`probe-output/`, git-ignored) contain private network data: MACs, hostnames,
@@ -129,7 +129,8 @@ Router setup commands (validated on the hAP ax³, 7.24.4):
 - **iOS:** Local Network prompt (`NSLocalNetworkUsageDescription`). No location permission and no
   Wi-Fi-info entitlement, because we don't read the SSID.
 - **Android:** `INTERNET`, plus the runtime `ACCESS_LOCAL_NETWORK` permission. We target
-  Android 17 (API 37), so this is required from day one.
+  Android 17 (API 37), so this is required from day one. The Phase 1 skeleton still uses
+  Flutter's default target SDK; raise it to 37 in Phase 2 along with the permission.
 
 ## Phases
 
@@ -144,6 +145,10 @@ Router setup commands (validated on the hAP ax³, 7.24.4):
    and turning raw captures into anonymized fixtures (Phase 1).
 1. **Skeleton.** Flutter project, lints, CI (GitHub Actions: analyze + test), `routeros` client,
    fake transport.
+   **Done 2026-09-24:** Flutter app `sh.nickd.watchtower` (Riverpod) at the repo root, with a
+   home screen showing the router summary. `RouterClient` interface in `packages/routeros`, plus
+   `DemoRouterClient`, which replays `assets/demo/router.json` (made by `bin/anonymize.dart`).
+   CI in `.github/workflows/ci.yml`.
 2. **Onboarding and connection.** Setup commands, address, fingerprint pinning, secure storage,
    permission prompts, connection gate.
 3. **Dashboard.** Router summary + live internet graph.
@@ -155,12 +160,13 @@ Router setup commands (validated on the hAP ax³, 7.24.4):
 ## Development environment
 
 Installed on the dev Mac (2026-09-23): Flutter 3.47.5 / Dart 3.13.4 and Android Studio
-(both via Homebrew), and Xcode 27.0.
+(both via Homebrew), and Xcode 27.0 with the iOS 27.0 simulator runtime.
 
 A free Apple ID is enough to run dev builds on your own iPhone (profiles expire after 7 days).
 TestFlight and the App Store need the paid Apple Developer Program.
 
-Test devices: an iPhone on iOS 26.6 and an Android phone on Android 17.
+Test devices: an iPhone 12 Pro on iOS 27 and an Android phone on Android 17. The app runs on the
+iOS 27 simulator (checked 2026-09-24). The deployment target stays at Flutter's default (iOS 15).
 
 For router testing: the hAP ax³ is the reference device. MikroTik's free virtual router (CHR) runs
 on Apple Silicon and is useful for automated tests of non-Wi-Fi features, but it has no Wi-Fi.
